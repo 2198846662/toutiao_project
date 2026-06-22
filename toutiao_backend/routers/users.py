@@ -62,7 +62,10 @@ async def update_user_info(
     user: User = Depends(get_current_user), 
     db: AsyncSession = Depends(get_db)
     ):
-    user = await users.update_user_info(db, user.username, user_info)  #调用crud封装好的方法，更新数据
+    try:
+        user = await users.update_user_info(db, user.username, user_info)  #调用crud封装好的方法，更新数据
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     return success_response(message="更新用户信息成功", data=UserInfoResponse.model_validate(user))
 
 
@@ -73,7 +76,10 @@ async def update_user_password(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    res_change_pwd = await users.update_user_password(db, user, password_data.old_password, password_data.new_password)  #调用crud封装好的方法，更新密码
+    try:
+        res_change_pwd = await users.update_user_password(db, user, password_data.old_password, password_data.new_password)  #调用crud封装好的方法，更新密码
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     if not res_change_pwd:
         raise HTTPException(status_code=400, detail="旧密码错误，修改密码失败")
     return success_response(message="修改用户密码成功")

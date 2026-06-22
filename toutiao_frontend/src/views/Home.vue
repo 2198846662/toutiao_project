@@ -99,15 +99,6 @@ const displayCategories = computed(() => {
   return newsStore.categories.filter(category => category.name !== '更多');
 })
 
-// 计算属性：更多下拉菜单中显示的分类（只显示军事、科技、财经分类）
-const moreCategories = computed(() => {
-  return newsStore.categories.filter(category => 
-    category.name === '军事' || 
-    category.name === '科技' || 
-    category.name === '财经'
-  );
-})
-
 // 获取分类名称的翻译
 const getCategoryTranslation = (categoryName) => {
   const categoryMap = {
@@ -131,28 +122,6 @@ const getCategoryTranslation = (categoryName) => {
 // 跳转到分类页面
 const goToCategory = () => {
   router.push('/category')
-}
-
-// 处理标签点击事件
-const handleTabClick = (index) => {
-  // 如果不是点击"更多"选项，则关闭下拉菜单
-  if (displayCategories.value[index].name !== '更多') {
-    showDropdown.value = false
-    newsStore.changeCategory(displayCategories.value[index].id)
-  }
-}
-
-// 选择更多分类中的某个分类
-const selectMoreCategory = (category) => {
-  showDropdown.value = false
-  newsStore.changeCategory(category.id)
-  
-  // 找到选中分类在原始分类中的索引
-  const index = newsStore.categories.findIndex(cat => cat.id === category.id)
-  if (index !== -1) {
-    // 直接设置activeTab为对应索引
-    activeTab.value = index
-  }
 }
 // 获取分类导航栏的位置并设置滚动监听
 const updateTabsPosition = () => {
@@ -190,16 +159,6 @@ const onLoad = () => {
   newsStore.getNewsList()
 }
 
-// 切换分类
-const changeCategory = (categoryId) => {
-  // 如果点击的是"更多"选项
-  if (categoryId === 10) {
-    goToCategory()
-    return
-  }
-  
-  newsStore.changeCategory(categoryId)
-}
 </script>
 
 <style scoped>

@@ -79,7 +79,7 @@ async def update_user_info(db: AsyncSession, username: str, user_info: UserUpdat
 
     #检查更新是否成功
     if result.rowcount == 0:
-        raise Exception("用户信息更新失败")
+        raise ValueError("用户信息更新失败")
     
     return await get_user_by_username(db, username)
 
@@ -88,9 +88,9 @@ async def update_user_info(db: AsyncSession, username: str, user_info: UserUpdat
 async def update_user_password(db: AsyncSession, user: User, old_password: str, new_password: str):
     user = await get_user_by_username(db, user.username)
     if not user:
-        raise Exception("用户不存在")
+        raise ValueError("用户不存在")
     if not security.verify_password(old_password, user.password):
-        raise Exception("旧密码错误")
+        raise ValueError("旧密码错误")
     
     hashed_new_password = security.get_hash_password(new_password)
     # 更新：由SQLAlchemy真正接管这个 User 对象，确保可以 commit

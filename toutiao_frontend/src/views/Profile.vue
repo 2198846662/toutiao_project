@@ -37,10 +37,8 @@
 <script setup>
 import { ref, computed, h, onMounted } from 'vue';
 import { useUserStore } from '../store/user';
-import { showDialog, showToast, showLoadingToast, showSuccessToast, showFailToast } from 'vant';
+import { showDialog, showToast, showLoadingToast, showSuccessToast, showFailToast, closeToast } from 'vant';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
-import { apiConfig } from '../config/api';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -81,8 +79,8 @@ onMounted(async () => {
   } catch (error) {
     console.error('获取用户信息请求失败:', error);
     // 确保关闭加载提示
-    showToast.clear();
-    showToast.fail('获取用户信息失败');
+    closeToast();
+    showFailToast('获取用户信息失败');
   }
 });
 
@@ -167,8 +165,8 @@ const showPasswordConfirm = () => {
       }
     } catch (error) {
       console.error('修改密码失败:', error);
-      showToast.clear();
-      showToast.fail('密码修改失败');
+      closeToast();
+      showFailToast('密码修改失败');
     }
   }).catch(() => {
     // 点击取消按钮
@@ -219,8 +217,8 @@ const showBioDialog = () => {
       }
     } catch (error) {
       console.error('更新个人简介失败:', error);
-      showToast.clear();
-      showToast.fail('个人简介修改失败');
+      closeToast();
+      showFailToast('个人简介修改失败');
     }
   }).catch(() => {
     // 点击取消按钮

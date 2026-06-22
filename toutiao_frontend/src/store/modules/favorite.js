@@ -88,7 +88,7 @@ export const useFavoriteStore = defineStore('favorite', {
         }
       } catch (error) {
         console.error('添加收藏请求失败:', error);
-        return { success: false, message: '网络请求失败' };
+        return { success: false, message: error.response?.data?.message || '网络请求失败' };
       } finally {
         this.loading = false;
       }
@@ -105,10 +105,11 @@ export const useFavoriteStore = defineStore('favorite', {
       
       try {
         this.loading = true;
-        const response = await axios.delete(`${apiConfig.baseURL}/api/favorite/remove?newsId=${newsId}`, { 
+        const response = await axios.delete(`${apiConfig.baseURL}/api/favorite/remove`, { 
           headers: { 
             Authorization: userStore.token 
-          }
+          },
+          params: { newsId }
         });
         
         if (response.data.code === 200) {
@@ -118,7 +119,7 @@ export const useFavoriteStore = defineStore('favorite', {
         }
       } catch (error) {
         console.error('取消收藏请求失败:', error);
-        return { success: false, message: '网络请求失败' };
+        return { success: false, message: error.response?.data?.message || '网络请求失败' };
       } finally {
         this.loading = false;
       }

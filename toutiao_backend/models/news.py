@@ -49,5 +49,5 @@ class News(Base):
     publish_time : Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False, comment="发布时间")
 
     def __repr__(self) -> str:
-        return f"News(id={self.id}, title='{self.title}', view={self.view})"
+        return f"News(id={self.id}, title='{self.title}', views={self.views})"
     

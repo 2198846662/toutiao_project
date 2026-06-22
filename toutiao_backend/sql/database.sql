@@ -138,22 +138,34 @@ CREATE TABLE IF NOT EXISTS `history` (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='浏览历史表';
 
--- AI聊天记录表（Agent）
-CREATE TABLE IF NOT EXISTS `ai_chat` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '聊天记录ID',
-  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `message` TEXT NOT NULL COMMENT '用户消息',
-  `response` TEXT NOT NULL COMMENT 'AI回复',
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+-- AI聊天会话表（Agent）
+CREATE TABLE IF NOT EXISTS `ai_chat_session` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '会话ID',
+  `session_id` VARCHAR(64) NOT NULL COMMENT '公开会话ID',
+  `user_id` INT NOT NULL COMMENT '用户ID',
+  `title` VARCHAR(100) NULL DEFAULT NULL COMMENT '会话标题',
+  `summary` VARCHAR(255) NULL DEFAULT NULL COMMENT '会话摘要',
+  `created_at` DATETIME NOT NULL COMMENT '创建时间',
+  `updated_at` DATETIME NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  INDEX `fk_ai_chat_user_idx` (`user_id` ASC),
-  INDEX `idx_created_at` (`created_at` DESC),
-  CONSTRAINT `fk_ai_chat_user`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `user` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI聊天记录表';
+  UNIQUE INDEX `session_id_UNIQUE` (`session_id` ASC),
+  INDEX `idx_ai_chat_session_user_id` (`user_id` ASC),
+  INDEX `idx_ai_chat_session_updated_at` (`updated_at` DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI聊天会话表';
+
+-- AI聊天消息表（Agent）
+CREATE TABLE IF NOT EXISTS `ai_chat_message` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '消息ID',
+  `session_id` VARCHAR(64) NOT NULL COMMENT '公开会话ID',
+  `user_id` INT NOT NULL COMMENT '用户ID',
+  `role` VARCHAR(20) NOT NULL COMMENT '消息角色：user/assistant/system',
+  `content` TEXT NOT NULL COMMENT '消息内容',
+  `created_at` DATETIME NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  INDEX `idx_ai_chat_message_session_id` (`session_id` ASC),
+  INDEX `idx_ai_chat_message_user_id` (`user_id` ASC),
+  INDEX `idx_ai_chat_message_created_at` (`created_at` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI聊天消息表';
 
 -- 初始化数据
 -- 插入默认新闻分类

@@ -11,7 +11,7 @@
     />
     
     <div class="history-list" v-if="historyStore.getHistory.length">
-      <div class="history-item" v-for="item in historyStore.getHistory" :key="item.id">
+      <div class="history-item" v-for="item in historyStore.getHistory" :key="item.historyId || item.id">
         <van-cell @click="goToNewsDetail(item.id)" :border="false">
           <template #title>
             <div class="news-item">
@@ -34,7 +34,7 @@
           type="danger" 
           size="mini" 
           icon="cross"
-          @click="confirmDelete(item.id)"
+          @click.stop="confirmDelete(item.historyId || item.id)"
         ></van-button>
       </div>
     </div>
@@ -63,9 +63,17 @@ const goToNewsDetail = (id) => {
 };
 
 // 删除单条历史记录
-const removeHistory = async (id) => {
+const removeHistory = async (historyId) => {
+  if (!historyId) {
+    showDialog({
+      title: '提示',
+      message: '缺少浏览记录ID，无法删除',
+    });
+    return;
+  }
+
   try {
-    const result = await historyStore.removeHistoryApi(id);
+    const result = await historyStore.removeHistoryApi(historyId);
     console.log('删除单条历史记录结果:', result);
     
     // 如果API请求失败且不是本地操作，则显示错误提示
@@ -83,14 +91,14 @@ const removeHistory = async (id) => {
 };
 
 // 确认删除
-const confirmDelete = (id) => {
+const confirmDelete = (historyId) => {
   showDialog({
     title: '提示',
     message: '确定要删除这条浏览记录吗？',
     showCancelButton: true,
   }).then((action) => {
     if (action === 'confirm') {
-      removeHistory(id);
+      removeHistory(historyId);
     }
   });
 };
