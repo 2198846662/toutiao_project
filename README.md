@@ -141,15 +141,15 @@ PUT  /api/user/password
 
 ```text
 GET    /api/admin/dashboard
-GET    /api/admin/news/list
-POST   /api/admin/news/add
-PUT    /api/admin/news/update/{news_id}
-DELETE /api/admin/news/delete/{news_id}
-GET    /api/admin/category/list
-POST   /api/admin/category/add
-PUT    /api/admin/category/update/{category_id}
-DELETE /api/admin/category/delete/{category_id}
-GET    /api/admin/users/list
+GET    /api/admin/news
+POST   /api/admin/news
+PUT    /api/admin/news/{news_id}
+DELETE /api/admin/news/{news_id}
+GET    /api/admin/categories
+POST   /api/admin/categories
+PUT    /api/admin/categories/{category_id}
+DELETE /api/admin/categories/{category_id}
+GET    /api/admin/users
 ```
 
 新闻：

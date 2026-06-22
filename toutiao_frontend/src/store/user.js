@@ -237,12 +237,7 @@ export const useUserStore = defineStore('user', {
   
   // 添加持久化配置
   persist: {
-    enabled: true,
-    strategies: [
-      {
-        key: 'user-store',
-        storage: localStorage
-      }
-    ]
+    key: 'user-store',
+    storage: localStorage
   }
 });

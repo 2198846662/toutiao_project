@@ -33,3 +33,13 @@ class SmallBugContractsTest(TestCase):
 
         self.assertNotIn("raise Exception", users_crud)
         self.assertIn("raise ValueError", users_crud)
+
+    def test_admin_route_guard_uses_pinia_store_and_login_redirect(self):
+        router = (PROJECT_ROOT / "toutiao_frontend/src/router/index.js").read_text(encoding="utf-8")
+        login = (PROJECT_ROOT / "toutiao_frontend/src/views/Login.vue").read_text(encoding="utf-8")
+
+        self.assertIn("useUserStore", router)
+        self.assertIn("getAuthToken", router)
+        self.assertIn("query: { redirect: to.fullPath }", router)
+        self.assertIn("useRoute", login)
+        self.assertIn("route.query.redirect", login)

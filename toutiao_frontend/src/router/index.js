@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import pinia from '../store'
+import { useUserStore } from '../store/user'
 
 const routes = [
   {
@@ -121,24 +123,33 @@ const router = createRouter({
   routes
 })
 
+const getAuthToken = () => {
+  const userStore = useUserStore(pinia)
+  if (userStore.token) return userStore.token
+
+  const directToken = localStorage.getItem('token')
+  if (directToken) return directToken
+
+  const persistedUserStore = localStorage.getItem('user-store')
+  if (!persistedUserStore) return ''
+
+  try {
+    return JSON.parse(persistedUserStore)?.token || ''
+  } catch {
+    return ''
+  }
+}
+
 // 全局前置守卫
 router.beforeEach((to, from, next) => {
   // 设置页面标题
   document.title = to.meta.title || '新闻资讯'
 
   if (to.meta.requireLogin) {
-    const persistedUserStore = localStorage.getItem('user-store')
-    let token = ''
-    if (persistedUserStore) {
-      try {
-        token = JSON.parse(persistedUserStore)?.token || ''
-      } catch {
-        token = ''
-      }
-    }
+    const token = getAuthToken()
 
     if (!token) {
-      next('/login')
+      next({ path: '/login', query: { redirect: to.fullPath } })
       return
     }
   }

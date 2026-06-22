@@ -38,6 +38,7 @@
       <van-cell-group inset>
         <van-cell :title="$t('my.myFavorite')" is-link @click="goToFavorite" />
         <van-cell :title="$t('my.browsingHistory')" is-link @click="goToHistory" />
+        <van-cell v-if="isAdmin" title="管理后台" is-link @click="goToAdmin" />
         <van-cell :title="$t('my.notifications')" is-link />
         <van-cell :title="$t('my.settings')" is-link @click="goToSettings" />
         <van-cell v-if="isLogin" :title="$t('my.logout')" @click="handleLogout" />
@@ -64,6 +65,7 @@ const { t } = useI18n();
 const userInfo = computed(() => userStore.userInfo);
 const isLogin = computed(() => userStore.getLoginStatus);
 const userBio = computed(() => userStore.getUserBio || t('profile.bio'));
+const isAdmin = computed(() => userStore.userInfo?.role === 'admin');
 
 // 跳转到登录页
 const goToLogin = () => {
@@ -105,6 +107,11 @@ const goToFavorite = () => {
 // 跳转到设置页面
 const goToSettings = () => {
   router.push('/settings');
+};
+
+// 跳转到管理后台
+const goToAdmin = () => {
+  router.push('/admin');
 };
 
 // 退出登录

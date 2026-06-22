@@ -28,7 +28,7 @@ async def get_dashboard(
     return success_response(message="获取后台统计成功", data=data)
 
 
-@router.get("/news/list")
+@router.get("/news")
 async def get_admin_news_list(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, alias="pageSize", ge=1, le=100),
@@ -45,7 +45,7 @@ async def get_admin_news_list(
     )
 
 
-@router.post("/news/add")
+@router.post("/news")
 async def add_admin_news(
     data: AdminNewsRequest,
     user: User = Depends(require_admin),
@@ -56,7 +56,7 @@ async def add_admin_news(
     return success_response(message="新增新闻成功", data=AdminNewsResponse.model_validate(news).model_dump(by_alias=True))
 
 
-@router.put("/news/update/{news_id}")
+@router.put("/news/{news_id}")
 async def update_admin_news(
     data: AdminNewsRequest,
     news_id: int = Path(..., ge=1),
@@ -70,7 +70,7 @@ async def update_admin_news(
     return success_response(message="更新新闻成功", data=AdminNewsResponse.model_validate(news).model_dump(by_alias=True))
 
 
-@router.delete("/news/delete/{news_id}")
+@router.delete("/news/{news_id}")
 async def delete_admin_news(
     news_id: int = Path(..., ge=1),
     user: User = Depends(require_admin),
@@ -83,7 +83,7 @@ async def delete_admin_news(
     return success_response(message="删除新闻成功", data=True)
 
 
-@router.get("/category/list")
+@router.get("/categories")
 async def get_admin_categories(
     user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
@@ -93,7 +93,7 @@ async def get_admin_categories(
     return success_response(message="获取分类管理列表成功", data=data)
 
 
-@router.post("/category/add")
+@router.post("/categories")
 async def add_admin_category(
     data: AdminCategoryRequest,
     user: User = Depends(require_admin),
@@ -107,7 +107,7 @@ async def add_admin_category(
     )
 
 
-@router.put("/category/update/{category_id}")
+@router.put("/categories/{category_id}")
 async def update_admin_category(
     data: AdminCategoryRequest,
     category_id: int = Path(..., ge=1),
@@ -124,7 +124,7 @@ async def update_admin_category(
     )
 
 
-@router.delete("/category/delete/{category_id}")
+@router.delete("/categories/{category_id}")
 async def delete_admin_category(
     category_id: int = Path(..., ge=1),
     user: User = Depends(require_admin),
@@ -137,7 +137,7 @@ async def delete_admin_category(
     return success_response(message="删除分类成功", data=True)
 
 
-@router.get("/users/list")
+@router.get("/users")
 async def get_admin_users(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, alias="pageSize", ge=1, le=100),

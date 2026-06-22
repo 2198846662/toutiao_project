@@ -16,60 +16,82 @@
         type="button"
         @click="activeSection = item.key"
       >
-        <van-icon :name="item.icon" />
-        <span>{{ item.label }}</span>
+        <van-icon :name="item.icon" class="nav-icon" />
+        <span class="nav-label">{{ item.label }}</span>
       </button>
     </aside>
 
     <main class="admin-main">
       <header class="admin-header">
         <div>
+          <span class="eyebrow">Admin Console</span>
           <h1>{{ currentTitle }}</h1>
           <p>{{ currentSubtitle }}</p>
         </div>
         <div class="admin-user">
+          <span class="online-dot"></span>
           <span>{{ userStore.userInfo?.username || '未登录' }}</span>
-          <button type="button" @click="goHome">返回前台</button>
+          <button type="button" @click="goHome">
+            <van-icon name="wap-home-o" />
+            返回前台
+          </button>
         </div>
       </header>
 
       <section v-if="status === 'login'" class="state-panel">
         <h2>需要登录</h2>
         <p>请先登录管理员账号。</p>
-        <van-button type="primary" @click="router.push('/login')">去登录</van-button>
+        <van-button icon="user-o" type="primary" @click="router.push('/login')">去登录</van-button>
       </section>
 
       <section v-else-if="status === 'forbidden'" class="state-panel">
         <h2>无管理员权限</h2>
         <p>当前账号不能访问后台管理。</p>
-        <van-button plain type="primary" @click="goHome">返回首页</van-button>
+        <van-button icon="wap-home-o" plain type="primary" @click="goHome">返回首页</van-button>
       </section>
 
       <section v-else-if="status === 'error'" class="state-panel">
         <h2>加载失败</h2>
         <p>{{ errorText }}</p>
-        <van-button type="primary" @click="bootstrap">重试</van-button>
+        <van-button icon="replay" type="primary" @click="bootstrap">重试</van-button>
       </section>
 
       <template v-else>
         <section v-if="activeSection === 'dashboard'" class="section-body">
+          <div class="section-heading">
+            <div>
+              <h2>运营概览</h2>
+              <p>实时查看内容、用户和互动数据。</p>
+            </div>
+          </div>
           <div class="metric-grid">
             <div v-for="metric in metrics" :key="metric.key" class="metric-card">
+              <div class="metric-icon">
+                <van-icon :name="metric.icon" />
+              </div>
               <span>{{ metric.label }}</span>
               <strong>{{ dashboard[metric.key] ?? 0 }}</strong>
+              <small>{{ metric.hint }}</small>
             </div>
           </div>
         </section>
 
         <section v-if="activeSection === 'news'" class="section-body">
+          <div class="section-heading">
+            <div>
+              <h2>新闻管理</h2>
+              <p>筛选、编辑和发布新闻内容。</p>
+            </div>
+            <span class="count-chip">{{ newsTotal }} 条新闻</span>
+          </div>
           <div class="toolbar">
             <input v-model.trim="newsQuery.keyword" placeholder="搜索标题、作者" @keyup.enter="loadNews" />
             <select v-model.number="newsQuery.categoryId">
               <option :value="0">全部分类</option>
               <option v-for="item in categories" :key="item.id" :value="item.id">{{ item.name }}</option>
             </select>
-            <van-button type="primary" @click="loadNews">查询</van-button>
-            <van-button type="success" @click="openNewsForm()">新增新闻</van-button>
+            <van-button icon="search" type="primary" @click="loadNews">查询</van-button>
+            <van-button icon="plus" type="success" @click="openNewsForm()">新增新闻</van-button>
           </div>
 
           <div class="table-wrap">
@@ -82,7 +104,7 @@
                   <th>作者</th>
                   <th>浏览</th>
                   <th>发布时间</th>
-                  <th>操作</th>
+                  <th class="action-cell">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,9 +115,15 @@
                   <td>{{ item.author || '-' }}</td>
                   <td>{{ item.views }}</td>
                   <td>{{ formatTime(item.publishTime) }}</td>
-                  <td>
-                    <button class="link-btn" type="button" @click="openNewsForm(item)">编辑</button>
-                    <button class="danger-btn" type="button" @click="removeNews(item)">删除</button>
+                  <td class="action-cell">
+                    <button class="link-btn" type="button" @click="openNewsForm(item)">
+                      <van-icon name="edit" />
+                      编辑
+                    </button>
+                    <button class="danger-btn" type="button" @click="removeNews(item)">
+                      <van-icon name="delete-o" />
+                      删除
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -104,20 +132,27 @@
           </div>
 
           <div class="pager">
-            <van-button size="small" :disabled="newsQuery.page <= 1" @click="changeNewsPage(-1)">上一页</van-button>
+            <van-button icon="arrow-left" size="small" :disabled="newsQuery.page <= 1" @click="changeNewsPage(-1)">上一页</van-button>
             <span>第 {{ newsQuery.page }} 页 / 共 {{ newsTotal }} 条</span>
-            <van-button size="small" :disabled="newsQuery.page * newsQuery.pageSize >= newsTotal" @click="changeNewsPage(1)">
+            <van-button icon="arrow" size="small" :disabled="newsQuery.page * newsQuery.pageSize >= newsTotal" @click="changeNewsPage(1)">
               下一页
             </van-button>
           </div>
         </section>
 
         <section v-if="activeSection === 'categories'" class="section-body">
+          <div class="section-heading">
+            <div>
+              <h2>分类管理</h2>
+              <p>维护频道名称和展示排序。</p>
+            </div>
+            <span class="count-chip">{{ categories.length }} 个分类</span>
+          </div>
           <div class="toolbar">
             <input v-model.trim="categoryForm.name" placeholder="分类名称" />
             <input v-model.number="categoryForm.sortOrder" type="number" placeholder="排序" />
-            <van-button type="primary" @click="saveCategory">{{ categoryForm.id ? '保存分类' : '新增分类' }}</van-button>
-            <van-button v-if="categoryForm.id" plain @click="resetCategoryForm">取消</van-button>
+            <van-button icon="plus" type="primary" @click="saveCategory">{{ categoryForm.id ? '保存分类' : '新增分类' }}</van-button>
+            <van-button v-if="categoryForm.id" icon="cross" plain @click="resetCategoryForm">取消</van-button>
           </div>
 
           <div class="table-wrap compact">
@@ -127,7 +162,7 @@
                   <th>ID</th>
                   <th>分类名称</th>
                   <th>排序</th>
-                  <th>操作</th>
+                  <th class="action-cell">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,9 +170,15 @@
                   <td>{{ item.id }}</td>
                   <td>{{ item.name }}</td>
                   <td>{{ item.sortOrder }}</td>
-                  <td>
-                    <button class="link-btn" type="button" @click="editCategory(item)">编辑</button>
-                    <button class="danger-btn" type="button" @click="removeCategory(item)">删除</button>
+                  <td class="action-cell">
+                    <button class="link-btn" type="button" @click="editCategory(item)">
+                      <van-icon name="edit" />
+                      编辑
+                    </button>
+                    <button class="danger-btn" type="button" @click="removeCategory(item)">
+                      <van-icon name="delete-o" />
+                      删除
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -146,9 +187,16 @@
         </section>
 
         <section v-if="activeSection === 'users'" class="section-body">
+          <div class="section-heading">
+            <div>
+              <h2>用户管理</h2>
+              <p>查看注册用户、身份和账号信息。</p>
+            </div>
+            <span class="count-chip">{{ userTotal }} 位用户</span>
+          </div>
           <div class="toolbar">
             <input v-model.trim="userQuery.keyword" placeholder="搜索用户名、昵称、手机号" @keyup.enter="loadUsers" />
-            <van-button type="primary" @click="loadUsers">查询</van-button>
+            <van-button icon="search" type="primary" @click="loadUsers">查询</van-button>
           </div>
 
           <div class="table-wrap">
@@ -178,9 +226,9 @@
           </div>
 
           <div class="pager">
-            <van-button size="small" :disabled="userQuery.page <= 1" @click="changeUserPage(-1)">上一页</van-button>
+            <van-button icon="arrow-left" size="small" :disabled="userQuery.page <= 1" @click="changeUserPage(-1)">上一页</van-button>
             <span>第 {{ userQuery.page }} 页 / 共 {{ userTotal }} 条</span>
-            <van-button size="small" :disabled="userQuery.page * userQuery.pageSize >= userTotal" @click="changeUserPage(1)">
+            <van-button icon="arrow" size="small" :disabled="userQuery.page * userQuery.pageSize >= userTotal" @click="changeUserPage(1)">
               下一页
             </van-button>
           </div>
@@ -191,8 +239,13 @@
     <van-popup v-model:show="showNewsPopup" position="right" :style="{ width: 'min(680px, 92vw)', height: '100%' }">
       <div class="drawer">
         <header>
-          <h2>{{ newsForm.id ? '编辑新闻' : '新增新闻' }}</h2>
-          <button type="button" @click="showNewsPopup = false">关闭</button>
+          <div>
+            <span class="eyebrow">News Editor</span>
+            <h2>{{ newsForm.id ? '编辑新闻' : '新增新闻' }}</h2>
+          </div>
+          <button type="button" @click="showNewsPopup = false">
+            <van-icon name="cross" />
+          </button>
         </header>
 
         <label>
@@ -233,8 +286,8 @@
         </div>
 
         <footer>
-          <van-button plain @click="showNewsPopup = false">取消</van-button>
-          <van-button type="primary" :loading="saving" @click="saveNews">保存</van-button>
+          <van-button icon="cross" plain @click="showNewsPopup = false">取消</van-button>
+          <van-button icon="success" type="primary" :loading="saving" @click="saveNews">保存</van-button>
         </footer>
       </div>
     </van-popup>
@@ -259,11 +312,11 @@ const navItems = [
 ]
 
 const metrics = [
-  { key: 'newsCount', label: '新闻数' },
-  { key: 'categoryCount', label: '分类数' },
-  { key: 'userCount', label: '用户数' },
-  { key: 'favoriteCount', label: '收藏数' },
-  { key: 'historyCount', label: '浏览记录' },
+  { key: 'newsCount', label: '新闻数', icon: 'newspaper-o', hint: '已入库内容' },
+  { key: 'categoryCount', label: '分类数', icon: 'apps-o', hint: '频道配置' },
+  { key: 'userCount', label: '用户数', icon: 'friends-o', hint: '注册账号' },
+  { key: 'favoriteCount', label: '收藏数', icon: 'star-o', hint: '用户收藏' },
+  { key: 'historyCount', label: '浏览记录', icon: 'clock-o', hint: '阅读轨迹' },
 ]
 
 const activeSection = ref('dashboard')
@@ -525,35 +578,58 @@ onMounted(bootstrap)
 
 <style scoped>
 .admin-page {
+  --admin-bg: #f3f5f8;
+  --panel-bg: #ffffff;
+  --panel-soft: #f8fafc;
+  --sidebar-bg: #111827;
+  --sidebar-line: rgba(255, 255, 255, 0.08);
+  --text-main: #172033;
+  --text-muted: #697586;
+  --line: #e3e8ef;
+  --primary: #0f766e;
+  --primary-strong: #0b5f59;
+  --accent: #c2410c;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
-  background: #eef1f4;
-  color: #20242a;
+  grid-template-columns: 248px minmax(0, 1fr);
+  background:
+    linear-gradient(180deg, rgba(15, 118, 110, 0.08), transparent 280px),
+    var(--admin-bg);
+  color: var(--text-main);
+  font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
 }
 
 .admin-sidebar {
-  background: #15191f;
-  color: #f7f9fb;
-  padding: 20px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  color: #f8fafc;
+  padding: 22px 14px;
+  background:
+    linear-gradient(180deg, #111827 0%, #172033 56%, #0f172a 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 6px 22px;
+  gap: 12px;
+  padding: 6px 8px 22px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--sidebar-line);
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  background: #0ea5a4;
   color: #fff;
-  font-weight: 800;
-  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 900;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0f766e, #2563eb);
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.28);
 }
 
 .brand strong,
@@ -561,61 +637,119 @@ onMounted(bootstrap)
   display: block;
 }
 
+.brand strong {
+  font-size: 17px;
+  letter-spacing: 0;
+}
+
 .brand span {
-  color: #aab3bf;
+  color: #aeb8c7;
   font-size: 12px;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .nav-item {
+  position: relative;
   width: 100%;
-  height: 42px;
+  height: 44px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
-  color: #c7d0db;
-  padding: 0 12px;
+  color: #c8d1df;
+  padding: 0 13px;
   margin-bottom: 6px;
   cursor: pointer;
   text-align: left;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
-.nav-item.active,
 .nav-item:hover {
-  background: #242b34;
   color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-item.active {
+  color: #fff;
+  background: rgba(15, 118, 110, 0.28);
+}
+
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 22px;
+  border-radius: 999px;
+  background: #2dd4bf;
+}
+
+.nav-icon {
+  font-size: 18px;
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .admin-main {
   min-width: 0;
-  padding: 22px;
+  padding: 28px;
 }
 
 .admin-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 18px;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .admin-header h1 {
-  margin: 0;
-  font-size: 24px;
+  margin: 4px 0 0;
+  font-size: 30px;
+  line-height: 1.18;
+  letter-spacing: 0;
 }
 
 .admin-header p {
-  margin: 5px 0 0;
-  color: #697386;
+  margin: 7px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .admin-user {
+  min-height: 42px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #4c5768;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  color: #4b5565;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
 }
 
 .admin-user button,
@@ -625,51 +759,130 @@ onMounted(bootstrap)
   border: 0;
   background: transparent;
   cursor: pointer;
+  font: inherit;
 }
 
 .admin-user button {
-  height: 34px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 0 12px;
-  border-radius: 6px;
-  color: #0969da;
-  background: #fff;
+  border-radius: 7px;
+  color: #fff;
+  background: var(--text-main);
 }
 
 .section-body,
 .state-panel {
-  background: #fff;
-  border: 1px solid #dde3ea;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.95);
   border-radius: 8px;
-  padding: 18px;
+  padding: 20px;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
 }
 
 .state-panel {
   max-width: 520px;
 }
 
+.state-panel h2 {
+  margin: 0 0 8px;
+}
+
+.state-panel p {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.section-heading p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.count-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #0f766e;
+  background: #ccfbf1;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  grid-template-columns: repeat(5, minmax(126px, 1fr));
   gap: 14px;
 }
 
 .metric-card {
-  border: 1px solid #e0e5eb;
+  position: relative;
+  min-height: 150px;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 18px;
-  background: #fbfcfd;
+  padding: 17px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #fff, #f8fafc);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+}
+
+.metric-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0f766e, #2563eb, #c2410c);
+}
+
+.metric-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: #0f766e;
+  border-radius: 8px;
+  background: #e6fffb;
+  margin-bottom: 14px;
 }
 
 .metric-card span {
   display: block;
-  color: #687385;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
 .metric-card strong {
   display: block;
-  margin-top: 10px;
-  font-size: 28px;
+  margin-top: 8px;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.metric-card small {
+  display: block;
+  margin-top: 12px;
+  color: #95a1b2;
+  font-size: 12px;
 }
 
 .toolbar {
@@ -677,74 +890,142 @@ onMounted(bootstrap)
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
+  padding: 12px;
   margin-bottom: 14px;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+  background: var(--panel-soft);
 }
 
 input,
 select,
 textarea {
+  min-height: 38px;
   border: 1px solid #cfd7e2;
-  border-radius: 6px;
-  padding: 9px 10px;
+  border-radius: 7px;
+  padding: 9px 11px;
   background: #fff;
-  color: #20242a;
+  color: var(--text-main);
   outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.6;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #0ea5a4;
-  box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.12);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 .toolbar input {
-  min-width: 220px;
+  min-width: 230px;
+}
+
+.toolbar select {
+  min-width: 132px;
 }
 
 .table-wrap {
   overflow-x: auto;
-  border: 1px solid #e1e6ed;
+  border: 1px solid #e1e7ef;
   border-radius: 8px;
+  background: #fff;
 }
 
 .table-wrap.compact {
-  max-width: 760px;
+  max-width: 800px;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background: #fff;
 }
 
 th,
 td {
-  padding: 12px;
-  border-bottom: 1px solid #eef1f4;
+  padding: 13px 14px;
+  border-bottom: 1px solid #edf1f6;
   text-align: left;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 th {
-  color: #5c6677;
-  font-size: 13px;
-  background: #f7f9fb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #5f6c7d;
+  font-size: 12px;
+  font-weight: 800;
+  background: #f8fafc;
+}
+
+tbody tr {
+  transition: background 0.16s ease;
+}
+
+tbody tr:hover {
+  background: #f8fbfb;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .title-cell {
-  min-width: 260px;
-  max-width: 420px;
+  min-width: 280px;
+  max-width: 460px;
   white-space: normal;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.action-cell {
+  position: sticky;
+  right: 0;
+  min-width: 128px;
+  background: #fff;
+  box-shadow: -12px 0 18px rgba(15, 23, 42, 0.05);
+  z-index: 1;
+}
+
+tbody tr:hover .action-cell {
+  background: #f8fbfb;
+}
+
+th.action-cell {
+  background: #f8fafc;
+  z-index: 2;
+}
+
+.link-btn,
+.danger-btn {
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .link-btn {
-  color: #0969da;
-  margin-right: 10px;
+  color: #0b5f59;
+  background: #e6fffb;
+  margin-right: 8px;
 }
 
 .danger-btn {
-  color: #c2410c;
+  color: #b42318;
+  background: #fff1f0;
 }
 
 .pager {
@@ -752,8 +1033,9 @@ th {
   align-items: center;
   gap: 12px;
   justify-content: flex-end;
-  margin-top: 14px;
-  color: #697386;
+  margin-top: 15px;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .role-pill {
@@ -766,6 +1048,7 @@ th {
   background: #edf2f7;
   color: #475569;
   font-size: 12px;
+  font-weight: 800;
 }
 
 .role-pill.admin {
@@ -774,12 +1057,12 @@ th {
 }
 
 .drawer {
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px;
-  background: #fff;
+  gap: 15px;
+  padding: 22px;
+  background: #f7f9fc;
   overflow-y: auto;
 }
 
@@ -790,16 +1073,39 @@ th {
   justify-content: space-between;
 }
 
+.drawer header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e3e8ef;
+}
+
 .drawer h2 {
-  margin: 0;
-  font-size: 20px;
+  margin: 4px 0 0;
+  font-size: 22px;
+}
+
+.drawer header button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #475569;
+  background: #fff;
+  border: 1px solid #e3e8ef;
 }
 
 .drawer label {
   display: grid;
-  gap: 6px;
+  gap: 7px;
   color: #4c5768;
   font-size: 13px;
+  font-weight: 700;
+}
+
+.drawer input,
+.drawer select,
+.drawer textarea {
+  font-weight: 400;
 }
 
 .form-grid {
@@ -812,7 +1118,29 @@ th {
   justify-content: flex-end;
   gap: 10px;
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #e3e8ef;
+}
+
+:deep(.van-button) {
+  border-radius: 7px;
+  font-weight: 700;
+}
+
+:deep(.van-button--primary) {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:deep(.van-button--success) {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+@media (max-width: 1080px) {
+  .metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -823,7 +1151,8 @@ th {
   .admin-sidebar {
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 3;
+    height: auto;
     display: flex;
     gap: 6px;
     overflow-x: auto;
@@ -836,22 +1165,45 @@ th {
 
   .nav-item {
     width: auto;
-    min-width: 86px;
+    min-width: 88px;
     margin: 0;
+    justify-content: center;
+  }
+
+  .nav-item.active::before {
+    display: none;
   }
 
   .admin-main {
-    padding: 14px;
+    padding: 16px;
   }
 
   .admin-header {
-    align-items: flex-start;
-    gap: 12px;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-user {
+    justify-content: space-between;
+  }
+
+  .section-body,
+  .state-panel {
+    padding: 15px;
+  }
+
+  .section-heading {
     flex-direction: column;
   }
 
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .toolbar input,
+  .toolbar select {
+    width: 100%;
+    min-width: 0;
   }
 
   .form-grid {

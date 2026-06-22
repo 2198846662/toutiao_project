@@ -13,6 +13,28 @@ class AdminContractTest(TestCase):
     def test_admin_router_prefix(self):
         self.assertEqual(admin.router.prefix, "/api/admin")
 
+    def test_admin_router_has_restful_resource_paths(self):
+        paths = {route.path for route in admin.router.routes}
+
+        self.assertIn("/api/admin/news", paths)
+        self.assertIn("/api/admin/news/{news_id}", paths)
+        self.assertIn("/api/admin/categories", paths)
+        self.assertIn("/api/admin/categories/{category_id}", paths)
+        self.assertIn("/api/admin/users", paths)
+
+    def test_admin_router_does_not_keep_legacy_action_paths(self):
+        paths = {route.path for route in admin.router.routes}
+
+        self.assertNotIn("/api/admin/news/list", paths)
+        self.assertNotIn("/api/admin/news/add", paths)
+        self.assertNotIn("/api/admin/news/update/{news_id}", paths)
+        self.assertNotIn("/api/admin/news/delete/{news_id}", paths)
+        self.assertNotIn("/api/admin/category/list", paths)
+        self.assertNotIn("/api/admin/category/add", paths)
+        self.assertNotIn("/api/admin/category/update/{category_id}", paths)
+        self.assertNotIn("/api/admin/category/delete/{category_id}", paths)
+        self.assertNotIn("/api/admin/users/list", paths)
+
     def test_admin_schemas_accept_frontend_aliases(self):
         news = AdminNewsRequest(
             title="标题",
