@@ -617,6 +617,7 @@ CREATE TABLE `user`  (
   `gender` enum('male','female','unknown') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'unknown' COMMENT '性别',
   `bio` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '个人简介',
   `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '手机号',
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'user' COMMENT '用户角色',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
@@ -627,17 +628,17 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'admin', '$2b$12$TKevPbXcGL6Q1WdaFKbLhuueBuLfLyhkdk/0ESBvBv7X74.rNwiNm', '测试用户', NULL, 'unknown', '这是一个测试账号', NULL, '2026-06-12 18:08:10', '2026-06-12 18:08:10');
-INSERT INTO `user` VALUES (2, 'daqiu', '$2b$12$bmhSRXeuOfWX8/GisEIXRu0JXL8kGBNl.2j5YDXiJ0cKi.N1kd5dq', NULL, NULL, 'unknown', '我喜欢fastapi', NULL, '2026-06-15 15:07:07', '2026-06-20 21:51:25');
-INSERT INTO `user` VALUES (3, 'daqiu1', '$2b$12$iuj3tcc5RcaZNkXtjICIyu9c/nEHpkF9fc1NNv1k6Uc65AbvkrZuO', NULL, NULL, 'unknown', NULL, NULL, '2026-06-15 16:02:05', '2026-06-15 16:02:05');
-INSERT INTO `user` VALUES (4, 'daqiu3', '$2b$12$IciVkWaREJIiq7OprZ9Cd.puFIowxo8eoRUHV1MFMXNPKrVfdOL3O', NULL, NULL, 'unknown', NULL, NULL, '2026-06-16 11:52:11', '2026-06-16 11:52:11');
-INSERT INTO `user` VALUES (5, 'daqiu4', '$2b$12$hfp6lSDXAfEYkKkySJxpGOb0Fk1A2QJwRFjhUX049ouTka6yrj6bq', NULL, NULL, 'unknown', NULL, NULL, '2026-06-16 11:53:24', '2026-06-16 11:53:24');
-INSERT INTO `user` VALUES (6, 'daqiu5', '$2b$12$7rDHxFgEJ8mOs.hAjqtfBuonX73S3DPjRDDKNGBnhadvx5VRUk6bC', NULL, NULL, 'unknown', '这个人很懒...', NULL, '2026-06-16 11:55:02', '2026-06-16 11:55:02');
-INSERT INTO `user` VALUES (7, 'codex_fav_test_201150081', '$2b$12$z3otcN38K.s/wRnFlmEHvOIB65d8l5hjmPD9pajVzfpJ0RKLqKsnC', NULL, NULL, 'unknown', '这个人很懒...', NULL, '2026-06-21 17:17:09', '2026-06-21 17:17:09');
-INSERT INTO `user` VALUES (8, 'codex_fav_test_215678310', '$2b$12$s0UID3WHTzwc14mbn1nFKurS2d0AVDF15PKHlkfyzUSr8AntXBJ2q', NULL, NULL, 'unknown', '这个人很懒...', NULL, '2026-06-21 17:25:28', '2026-06-21 17:25:28');
-INSERT INTO `user` VALUES (9, 'codex_fav_test_2043613213', '$2b$12$CGhL5k3UAarfW.Dkhd7Nx.8MNAjr4jusrfUcjEGH93b1mNsTj4Zgi', NULL, NULL, 'unknown', '这个人很懒...', NULL, '2026-06-21 17:26:31', '2026-06-21 17:26:31');
-INSERT INTO `user` VALUES (10, 'codex_history_red_139128389', '$2b$12$LGNFOYcaDO/xTfjWi6dwkOVZ3pfoTEGfk54GEBRKSLvMbbe7IPfYO', NULL, NULL, 'unknown', '这个人很懒...', NULL, '2026-06-22 09:46:05', '2026-06-22 09:46:05');
-INSERT INTO `user` VALUES (11, 'codex_history_test_1159876466', '$2b$12$bAKEo.eYsKPciY6Er.lTJ.NyUPsnynJ/uW.o1sNEZ1HAGkYZZpga.', NULL, NULL, 'unknown', '这个人很懒...', NULL, '2026-06-22 09:48:52', '2026-06-22 09:48:52');
+INSERT INTO `user` VALUES (1, 'admin', '$2b$12$TKevPbXcGL6Q1WdaFKbLhuueBuLfLyhkdk/0ESBvBv7X74.rNwiNm', '测试用户', NULL, 'unknown', '这是一个测试账号', NULL, 'admin', '2026-06-12 18:08:10', '2026-06-12 18:08:10');
+INSERT INTO `user` VALUES (2, 'daqiu', '$2b$12$bmhSRXeuOfWX8/GisEIXRu0JXL8kGBNl.2j5YDXiJ0cKi.N1kd5dq', NULL, NULL, 'unknown', '我喜欢fastapi', NULL, 'user', '2026-06-15 15:07:07', '2026-06-20 21:51:25');
+INSERT INTO `user` VALUES (3, 'daqiu1', '$2b$12$iuj3tcc5RcaZNkXtjICIyu9c/nEHpkF9fc1NNv1k6Uc65AbvkrZuO', NULL, NULL, 'unknown', NULL, NULL, 'user', '2026-06-15 16:02:05', '2026-06-15 16:02:05');
+INSERT INTO `user` VALUES (4, 'daqiu3', '$2b$12$IciVkWaREJIiq7OprZ9Cd.puFIowxo8eoRUHV1MFMXNPKrVfdOL3O', NULL, NULL, 'unknown', NULL, NULL, 'user', '2026-06-16 11:52:11', '2026-06-16 11:52:11');
+INSERT INTO `user` VALUES (5, 'daqiu4', '$2b$12$hfp6lSDXAfEYkKkySJxpGOb0Fk1A2QJwRFjhUX049ouTka6yrj6bq', NULL, NULL, 'unknown', NULL, NULL, 'user', '2026-06-16 11:53:24', '2026-06-16 11:53:24');
+INSERT INTO `user` VALUES (6, 'daqiu5', '$2b$12$7rDHxFgEJ8mOs.hAjqtfBuonX73S3DPjRDDKNGBnhadvx5VRUk6bC', NULL, NULL, 'unknown', '这个人很懒...', NULL, 'user', '2026-06-16 11:55:02', '2026-06-16 11:55:02');
+INSERT INTO `user` VALUES (7, 'codex_fav_test_201150081', '$2b$12$z3otcN38K.s/wRnFlmEHvOIB65d8l5hjmPD9pajVzfpJ0RKLqKsnC', NULL, NULL, 'unknown', '这个人很懒...', NULL, 'user', '2026-06-21 17:17:09', '2026-06-21 17:17:09');
+INSERT INTO `user` VALUES (8, 'codex_fav_test_215678310', '$2b$12$s0UID3WHTzwc14mbn1nFKurS2d0AVDF15PKHlkfyzUSr8AntXBJ2q', NULL, NULL, 'unknown', '这个人很懒...', NULL, 'user', '2026-06-21 17:25:28', '2026-06-21 17:25:28');
+INSERT INTO `user` VALUES (9, 'codex_fav_test_2043613213', '$2b$12$CGhL5k3UAarfW.Dkhd7Nx.8MNAjr4jusrfUcjEGH93b1mNsTj4Zgi', NULL, NULL, 'unknown', '这个人很懒...', NULL, 'user', '2026-06-21 17:26:31', '2026-06-21 17:26:31');
+INSERT INTO `user` VALUES (10, 'codex_history_red_139128389', '$2b$12$LGNFOYcaDO/xTfjWi6dwkOVZ3pfoTEGfk54GEBRKSLvMbbe7IPfYO', NULL, NULL, 'unknown', '这个人很懒...', NULL, 'user', '2026-06-22 09:46:05', '2026-06-22 09:46:05');
+INSERT INTO `user` VALUES (11, 'codex_history_test_1159876466', '$2b$12$bAKEo.eYsKPciY6Er.lTJ.NyUPsnynJ/uW.o1sNEZ1HAGkYZZpga.', NULL, NULL, 'unknown', '这个人很懒...', NULL, 'user', '2026-06-22 09:48:52', '2026-06-22 09:48:52');
 
 -- ----------------------------
 -- Table structure for user_token

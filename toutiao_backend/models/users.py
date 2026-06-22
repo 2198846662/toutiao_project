@@ -21,6 +21,7 @@ class User(Base):
     gender : Mapped[str|None] = mapped_column(Enum('male', 'female', 'unknown'), comment="用户性别",default='unknown')
     bio : Mapped[str|None] = mapped_column(String(500), comment="用户简介",default="这个人很懒...")
     phone : Mapped[str|None] = mapped_column(String(20), unique=True, comment="用户手机号")
+    role : Mapped[str] = mapped_column(String(20), default="user", nullable=False, comment="用户角色")
     created_at : Mapped[datetime] = mapped_column(DateTime, default=datetime.now, comment="创建时间")
     updated_at : Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now, comment="更新时间")
 

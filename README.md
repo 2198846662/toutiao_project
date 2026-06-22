@@ -16,6 +16,7 @@
 - 浏览历史添加、分页列表、删除单条历史、清空历史
 - Redis 缓存新闻分类、新闻列表、新闻详情、相关新闻
 - AI 问答，支持会话列表和多轮上下文记忆
+- 管理后台，支持数据概览、新闻管理、分类管理、用户列表
 
 ## 目录结构
 
@@ -136,6 +137,21 @@ PUT  /api/user/update
 PUT  /api/user/password
 ```
 
+管理后台：
+
+```text
+GET    /api/admin/dashboard
+GET    /api/admin/news/list
+POST   /api/admin/news/add
+PUT    /api/admin/news/update/{news_id}
+DELETE /api/admin/news/delete/{news_id}
+GET    /api/admin/category/list
+POST   /api/admin/category/add
+PUT    /api/admin/category/update/{category_id}
+DELETE /api/admin/category/delete/{category_id}
+GET    /api/admin/users/list
+```
+
 新闻：
 
 ```text
@@ -175,6 +191,19 @@ GET  /api/ai/sessions/{session_id}/messages
 
 ```text
 Authorization: Bearer 登录后返回的token
+```
+
+管理后台页面：
+
+```text
+http://localhost:5173/admin
+```
+
+访问后台需要登录管理员账号。`user` 表通过 `role` 字段区分权限：
+
+```text
+admin  管理员
+user   普通用户
 ```
 
 ## AI 记忆说明

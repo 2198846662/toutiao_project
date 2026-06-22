@@ -18,6 +18,7 @@ class UserInfoBase(BaseModel):
 class UserInfoResponse(UserInfoBase):
     id: int
     username: str
+    role: str = "user"
 
     model_config = ConfigDict(
         from_attributes=True,  #允许从ORM对象创建模型实例

@@ -2,7 +2,7 @@
 #key - value
 from typing import Any, Dict, List
 
-from config.cache_conf import get_cache_json, set_cache
+from config.cache_conf import delete_cache_pattern, get_cache_json, set_cache
 
 
 CATEGORIES_KEY_PREFIX = "news_cache:categories"    # key名前缀
@@ -60,3 +60,10 @@ async def set_cached_related_news(news_id: int, category_id: int, limit: int, re
 async def get_cached_related_news(news_id: int, category_id: int, limit: int):
     key = f"{RELATED_NEWS_KEY_PREFIX}{news_id}:{category_id}:{limit}"
     return await get_cache_json(key)
+
+
+async def clear_news_cache():
+    await delete_cache_pattern(f"{CATEGORIES_KEY_PREFIX}:*")
+    await delete_cache_pattern(f"{NEWS_LIST_KEY_PREFIX}*")
+    await delete_cache_pattern(f"{NEWS_DETAIL_KEY_PREFIX}*")
+    await delete_cache_pattern(f"{RELATED_NEWS_KEY_PREFIX}*")

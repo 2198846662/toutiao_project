@@ -104,6 +104,16 @@ const routes = [
       keepAlive: false
     }
   },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../views/Admin.vue'),
+    meta: {
+      title: '管理后台',
+      keepAlive: false,
+      requireLogin: true
+    }
+  },
 ]
 
 const router = createRouter({
@@ -115,6 +125,23 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 设置页面标题
   document.title = to.meta.title || '新闻资讯'
+
+  if (to.meta.requireLogin) {
+    const persistedUserStore = localStorage.getItem('user-store')
+    let token = ''
+    if (persistedUserStore) {
+      try {
+        token = JSON.parse(persistedUserStore)?.token || ''
+      } catch {
+        token = ''
+      }
+    }
+
+    if (!token) {
+      next('/login')
+      return
+    }
+  }
   
   // 直接允许访问所有页面
   next()
