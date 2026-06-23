@@ -94,6 +94,8 @@ import { useUserStore } from '../store/user';
 const chatStore = useChatStore();
 const userStore = useUserStore();
 
+chatStore.ensureCurrentUser();
+
 const messages = computed(() => chatStore.messages);
 const sessions = computed(() => chatStore.sessions);
 const currentSessionId = computed(() => chatStore.currentSessionId);
@@ -294,6 +296,20 @@ const switchSession = async (sessionId) => {
   }
 };
 
+const initChatSessions = async () => {
+  try {
+    await chatStore.fetchSessions();
+    const sessionId = chatStore.currentSessionId || chatStore.sessions[0]?.session_id;
+    if (sessionId) {
+      await chatStore.fetchSessionMessages(sessionId);
+    }
+  } catch (error) {
+    console.error('init chat sessions failed:', error);
+  }
+  await nextTick();
+  scrollToBottom();
+};
+
 // 滚动到底部
 const scrollToBottom = () => {
   if (messagesContainer.value) {
@@ -306,20 +322,18 @@ watch(messages, () => {
   nextTick(scrollToBottom);
 }, { deep: true });
 
+watch(
+  () => userStore.userInfo?.id,
+  async () => {
+    if (chatStore.ensureCurrentUser()) {
+      await initChatSessions();
+    }
+  }
+);
+
 // 组件挂载时滚动到底部
 onMounted(() => {
-  (async () => {
-    try {
-      await chatStore.fetchSessions();
-      if (chatStore.currentSessionId) {
-        await chatStore.fetchSessionMessages(chatStore.currentSessionId);
-      }
-    } catch (error) {
-      console.error('init chat sessions failed:', error);
-    }
-    await nextTick();
-    scrollToBottom();
-  })();
+  initChatSessions();
 });
 </script>
 

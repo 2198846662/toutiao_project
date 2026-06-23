@@ -10,6 +10,7 @@ const WELCOME_MESSAGE = {
 
 export const useChatStore = defineStore('chat', {
   state: () => ({
+    ownerKey: '',
     currentSessionId: '',
     sessions: [],
     messages: [WELCOME_MESSAGE],
@@ -23,20 +24,58 @@ export const useChatStore = defineStore('chat', {
   },
 
   actions: {
+    getPersistedUserStore() {
+      const persistedUserStore = localStorage.getItem('user-store')
+      if (!persistedUserStore) return {}
+      try {
+        return JSON.parse(persistedUserStore) || {}
+      } catch {
+        return {}
+      }
+    },
+
+    getCurrentOwnerKey() {
+      const userStore = useUserStore()
+      const persistedUserStore = this.getPersistedUserStore()
+      const userId = userStore.userInfo?.id || persistedUserStore.userInfo?.id
+      if (userId) return `user:${userId}`
+
+      const token = userStore.token || localStorage.getItem('token') || persistedUserStore.token || ''
+      return token ? `token:${token}` : ''
+    },
+
+    clearLocalState() {
+      this.ownerKey = ''
+      this.currentSessionId = ''
+      this.sessions = []
+      this.messages = [WELCOME_MESSAGE]
+      this.isStreaming = false
+    },
+
+    ensureCurrentUser() {
+      const ownerKey = this.getCurrentOwnerKey()
+      if (!ownerKey) {
+        this.clearLocalState()
+        return false
+      }
+
+      if (this.ownerKey !== ownerKey) {
+        this.ownerKey = ownerKey
+        this.currentSessionId = ''
+        this.sessions = []
+        this.messages = [WELCOME_MESSAGE]
+        this.isStreaming = false
+      }
+      return true
+    },
+
     getAuthHeader() {
       const userStore = useUserStore()
       let token = userStore.token || localStorage.getItem('token') || ''
 
       // 兼容 pinia 持久化：user-store 里保存了 token
       if (!token) {
-        const persistedUserStore = localStorage.getItem('user-store')
-        if (persistedUserStore) {
-          try {
-            token = JSON.parse(persistedUserStore)?.token || ''
-          } catch {
-            token = ''
-          }
-        }
+        token = this.getPersistedUserStore()?.token || ''
       }
 
       return {
@@ -85,6 +124,8 @@ export const useChatStore = defineStore('chat', {
     },
 
     async fetchSessions() {
+      if (!this.ensureCurrentUser()) return
+
       const headers = this.getAuthHeader()
       if (!headers.Authorization) return
 
@@ -98,6 +139,8 @@ export const useChatStore = defineStore('chat', {
     },
 
     async fetchSessionMessages(sessionId) {
+      if (!this.ensureCurrentUser()) return
+
       if (!sessionId) {
         this.resetAsNewSession()
         return

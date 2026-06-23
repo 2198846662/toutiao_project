@@ -14,6 +14,7 @@
         :key="item.key"
         :class="['nav-item', { active: activeSection === item.key }]"
         type="button"
+        :aria-current="activeSection === item.key ? 'page' : undefined"
         @click="activeSection = item.key"
       >
         <van-icon :name="item.icon" class="nav-icon" />
@@ -85,11 +86,17 @@
             <span class="count-chip">{{ newsTotal }} 条新闻</span>
           </div>
           <div class="toolbar">
-            <input v-model.trim="newsQuery.keyword" placeholder="搜索标题、作者" @keyup.enter="loadNews" />
-            <select v-model.number="newsQuery.categoryId">
+            <label class="field-control">
+              <span>关键词</span>
+              <input v-model.trim="newsQuery.keyword" placeholder="搜索标题、作者" @keyup.enter="loadNews" />
+            </label>
+            <label class="field-control">
+              <span>分类</span>
+              <select v-model.number="newsQuery.categoryId">
               <option :value="0">全部分类</option>
               <option v-for="item in categories" :key="item.id" :value="item.id">{{ item.name }}</option>
-            </select>
+              </select>
+            </label>
             <van-button icon="search" type="primary" @click="loadNews">查询</van-button>
             <van-button icon="plus" type="success" @click="openNewsForm()">新增新闻</van-button>
           </div>
@@ -149,8 +156,14 @@
             <span class="count-chip">{{ categories.length }} 个分类</span>
           </div>
           <div class="toolbar">
-            <input v-model.trim="categoryForm.name" placeholder="分类名称" />
-            <input v-model.number="categoryForm.sortOrder" type="number" placeholder="排序" />
+            <label class="field-control">
+              <span>分类名称</span>
+              <input v-model.trim="categoryForm.name" placeholder="分类名称" />
+            </label>
+            <label class="field-control short">
+              <span>排序</span>
+              <input v-model.number="categoryForm.sortOrder" type="number" placeholder="排序" />
+            </label>
             <van-button icon="plus" type="primary" @click="saveCategory">{{ categoryForm.id ? '保存分类' : '新增分类' }}</van-button>
             <van-button v-if="categoryForm.id" icon="cross" plain @click="resetCategoryForm">取消</van-button>
           </div>
@@ -195,7 +208,10 @@
             <span class="count-chip">{{ userTotal }} 位用户</span>
           </div>
           <div class="toolbar">
-            <input v-model.trim="userQuery.keyword" placeholder="搜索用户名、昵称、手机号" @keyup.enter="loadUsers" />
+            <label class="field-control">
+              <span>关键词</span>
+              <input v-model.trim="userQuery.keyword" placeholder="搜索用户名、昵称、手机号" @keyup.enter="loadUsers" />
+            </label>
             <van-button icon="search" type="primary" @click="loadUsers">查询</van-button>
           </div>
 
@@ -243,7 +259,7 @@
             <span class="eyebrow">News Editor</span>
             <h2>{{ newsForm.id ? '编辑新闻' : '新增新闻' }}</h2>
           </div>
-          <button type="button" @click="showNewsPopup = false">
+          <button type="button" aria-label="关闭编辑面板" @click="showNewsPopup = false">
             <van-icon name="cross" />
           </button>
         </header>
@@ -1208,6 +1224,327 @@ th.action-cell {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ui-ux-pro-max: restrained content-management admin polish */
+.admin-page {
+  --admin-bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --sidebar-bg: #172033;
+  --sidebar-hover: #233047;
+  --text-main: #1f2937;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --primary: #176b87;
+  --primary-hover: #12546a;
+  --primary-soft: #e8f4f7;
+  --danger: #b42318;
+  --danger-soft: #fff1f0;
+  --success: #2563eb;
+  --focus: rgba(23, 107, 135, 0.18);
+  grid-template-columns: 240px minmax(0, 1fr);
+  background: var(--admin-bg);
+  color: var(--text-main);
+}
+
+.admin-sidebar {
+  padding: 18px 12px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid #111827;
+}
+
+.brand {
+  padding: 6px 8px 18px;
+  margin-bottom: 12px;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+  font-weight: 800;
+  background: var(--primary);
+  box-shadow: none;
+}
+
+.nav-item {
+  min-height: 44px;
+  height: auto;
+  gap: 10px;
+  color: #d6deea;
+  padding: 0 12px;
+  margin-bottom: 4px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.nav-item:hover {
+  background: var(--sidebar-hover);
+}
+
+.nav-item.active {
+  background: var(--primary);
+}
+
+.nav-item.active::before {
+  height: 24px;
+  background: #fff;
+}
+
+.admin-main {
+  padding: 24px 28px 32px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-header h1 {
+  font-size: 28px;
+}
+
+.admin-user {
+  min-height: 44px;
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.admin-user button:hover {
+  background: #0f172a;
+}
+
+.section-body {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.state-panel {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.section-heading {
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  font-size: 20px;
+}
+
+.count-chip {
+  min-height: 30px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.metric-grid {
+  gap: 12px;
+}
+
+.metric-card {
+  min-height: 136px;
+  padding: 16px;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.metric-card::after {
+  display: none;
+}
+
+.metric-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  margin-bottom: 12px;
+}
+
+.metric-card strong {
+  font-size: 28px;
+}
+
+.metric-card small {
+  color: var(--text-subtle);
+}
+
+.toolbar {
+  align-items: flex-end;
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.field-control {
+  display: grid;
+  gap: 6px;
+  min-width: 230px;
+}
+
+.field-control.short {
+  min-width: 120px;
+}
+
+.field-control span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  min-height: 40px;
+  border-color: var(--line-strong);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.table-wrap {
+  border-color: var(--line);
+  background: var(--surface);
+  width: 100%;
+}
+
+th,
+td {
+  padding: 12px 14px;
+  border-bottom-color: #edf2f7;
+}
+
+th {
+  color: #475569;
+  background: var(--surface-muted);
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+.title-cell {
+  font-weight: 600;
+}
+
+.action-cell {
+  background: var(--surface);
+  box-shadow: -10px 0 16px rgba(15, 23, 42, 0.04);
+}
+
+tbody tr:hover .action-cell {
+  background: #f8fafc;
+}
+
+th.action-cell {
+  background: var(--surface-muted);
+}
+
+.link-btn,
+.danger-btn {
+  min-height: 32px;
+}
+
+.link-btn {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.link-btn:hover {
+  color: #fff;
+  background: var(--primary);
+}
+
+.danger-btn {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.danger-btn:hover {
+  color: #fff;
+  background: var(--danger);
+}
+
+.drawer {
+  background: var(--surface);
+}
+
+.drawer header button {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+:deep(.van-button) {
+  min-height: 40px;
+}
+
+:deep(.van-button--primary) {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:deep(.van-button--primary:hover) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+:deep(.van-button--success) {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+:deep(.van-button:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-main {
+    padding: 16px;
+  }
+
+  .admin-user {
+    align-items: center;
+  }
+
+  .field-control,
+  .field-control.short,
+  .toolbar input,
+  .toolbar select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .section-body {
+    padding: 0;
   }
 }
 </style>

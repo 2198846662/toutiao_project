@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div :class="['app', { 'admin-shell': isAdminRoute }]">
     <router-view v-slot="{ Component }">
       <keep-alive :include="cachedViews">
         <component :is="Component" />
@@ -9,7 +9,12 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
 const cachedViews = ['Home', 'Category', 'AIChat', 'My']
+const route = useRoute()
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 </script>
 
 <style>
@@ -35,6 +40,13 @@ html, body {
   max-width: 750px;
   margin: 0 auto;
   height: 100%;
+}
+
+.app.admin-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-height: 100%;
 }
 
 /* 移动端适配 */
