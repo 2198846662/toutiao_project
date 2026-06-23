@@ -44,8 +44,7 @@
         </div>
         
         <div class="login-tips">
-          <p>测试账号：admin</p>
-          <p>测试密码：123456</p>
+          <p>请使用已注册账号登录</p>
         </div>
       </van-form>
     </div>

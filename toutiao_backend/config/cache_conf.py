@@ -20,10 +20,10 @@ def load_env_file() -> None:
 load_env_file()
 
 REDIS_ENABLED = os.getenv("REDIS_ENABLED", "false").lower() in {"1", "true", "yes", "on"}
-REDIS_HOST = os.getenv("REDIS_HOST", "192.168.152.128")
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "xcl123456") or None
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "") or None
 REDIS_TIMEOUT = float(os.getenv("REDIS_TIMEOUT", "1"))
 
 
